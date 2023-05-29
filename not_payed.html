@@ -41,9 +41,10 @@
                                 guardian.name, 
                                 prescription.medication_name, 
                                 prescription.medication_dosage,
-                                ((hospital_room.cost + prescription.medication_cost * prescription.medication_dosage) - payment.cost) AS unpaid_amount
+                                IF(hospital_room.room_number IS NULL, (prescription.medication_cost * prescription.medication_dosage) - payment.cost,
+                                ((hospital_room.cost + prescription.medication_cost * prescription.medication_dosage) - payment.cost)) AS unpaid_amount
                             FROM patient
-                            JOIN hospital_room ON patient.room_number = hospital_room.room_number
+                            LEFT JOIN hospital_room ON patient.room_number = hospital_room.room_number
                             JOIN guardian ON patient.resident_number = guardian.patient_resident_number
                             JOIN disease ON patient.disease_name = disease.disease_name
                             JOIN prescription_details ON patient.resident_number = prescription_details.resident_number
