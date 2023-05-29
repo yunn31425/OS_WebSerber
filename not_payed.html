@@ -1,52 +1,83 @@
-<?php
-    $conn = mysqli_connect(
-    'localhost:3306',
-    'root',
-    'lab1234!',
-    'hello');
-    $sql = "SELECT patient.name
-            FROM patient
-            JOIN professor ON patient.professor_license_number = professor.license_number
-            WHERE professor.license_number = '452314563'";
-    $result = mysqli_query($conn, $sql);
-    // var_dump($result->num_rows);
-    if ($result->num_rows > 0){
-        while( $jb_row = mysqli_fetch_array( $jb_result ) ) {
-            echo
-              '<p>'
-              . $jb_row[ 'patient.name' ]
-              . '</p>'
-            ;
-          }
-    }
-    else{   
-    }  
-?>
-
 <!DOCTYPE html>
 <html lang="kr">
 <head>
     <meta charset="utf-8">
-    <title>환자 미납 금액확인</title>
+    <title>환자 미납 금액 확인</title>
 </head>
 
 <body>
-    <div style="border : 2px solid black ; width: 70% ; background-color:background-color:azure; height : 500pt">
-        <h2>
-            환자 미납 금액확인
-        </h2>
-        <h4> <a href="index.html"> 이전으로</h3> </a> </h4>
-    </br>
-        <label for="patient_name">환자명:</label>
-        <input type="text" id = "patient_name" name = "patient_name" required 
-        minlength="4" maxlength="8" size="10">
-        <button type="button" onclick="">조회</button>
-
-        <div style="border : 2px solid black ; width: 95% ; background-color:blanchedalmond; height : 300pt; margin: auto">
-      
+    <div style="border : 2px solid black ; width: 70% ; background-color:background-color:azure; height : 450pt">
+        <div style="border : 2px solid black ; width: 95% ; background-color:blanchedalmond; height : 100pt; margin: auto; margin-top: 10px">
+            <h2  style="display:inline">
+                환자 미납 금액
+            </h2>
+            <h4> <a href="index.html"> 이전으로 </a> </h4>
+            <h4 style="display:inline">환자 이름  :   </h4>
+            <form name = "name" method="post" action="#" style="display:inline"> 
+                <input type="text" name="name"  value="">
+                <input type="submit" value="입력" name="Submit"> 
+            </form>
         </div>
+    </br>
+            <div style="border : 2px solid black ; width: 95% ; background-color:blanchedalmond; height : 300pt; margin: auto">
+            <?php
+                if(isset($_POST['Submit'])){
+                    error_reporting(E_ALL);
+                    ini_set('display_errors', '1');
+                    $conn = mysqli_connect(
+                    'localhost:3306',
+                    'root',
+                    'lab1234!',
+                    'hello');
+
+                    $name = $_POST['name'];
+                    $sql = "SELECT patient.name
+                            FROM patient
+                            JOIN professor ON patient.professor_license_number = professor.license_number
+                            WHERE professor.license_number = '".$name."'";
+                    $result = mysqli_query($conn, $sql);
+
+                    if ($re = mysqli_fetch_array($result)){
+                    ?>
+                    
+                    <table border = '1' style="margin-top: 10px; margin-left:10px">
+                        <thead>
+                        <tr>
+                            <th>환자명</th>
+                        </tr>
+                        </thead>
+                        </tbody>
+                    <?php
+                        while(1){
+                    ?>       
+                            <tr>
+                                <td><?=$re[0]?></td>
+                            </tr>
+                        <?php
+                            if(!($re = mysqli_fetch_array($result))){
+                                ?>
+                    </tbody>
+                    </table>
+                                <?php
+                                break;
+                            }
+                        }
+                        
+                    }
+                    else{
+                        print("해당 레코드 없음");
+                    }   
+
+                    mysqli_close($conn);
+                }
+            ?>
+        
+            </div>
     </div>
 
 </body>
+<footer>
+    경상국립대학교 항공우주및소프트웨어 운영체제 2023년 1학기
+</footer>
 
 </html>
