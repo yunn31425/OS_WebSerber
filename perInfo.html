@@ -13,8 +13,8 @@
             </h2>
             <h4> <a href="index.html"> 이전으로 </a> </h4>
             <h4 style="display:inline">환자 이름  :   </h4>
-            <form name = "name" method="post" action="#" style="display:inline"> 
-                <input type="text" name="name"  value="">
+            <form name = "r_number" method="post" action="#" style="display:inline"> 
+                <input type="text" name="r_number"  value="">
                 <input type="submit" value="입력" name="Submit"> 
             </form>
         </div>
@@ -30,11 +30,22 @@
                     'lab1234!',
                     'hello');
 
-                    $name = $_POST['name'];
-                    $sql = "SELECT patient.name
+                    $r_number = $_POST['r_number'];
+                    $sql = "SELECT
+                                patient.name, 
+                                patient.gender, 
+                                patient.height, 
+                                patient.weight, 
+                                patient.phone_number, 
+                                patient.room_number, 
+                                patient.disease_name,
+                                prescription_details.medication_name, 
+                                professor.name
                             FROM patient
+                            JOIN prescription_details ON patient.resident_number = prescription_details.resident_number
                             JOIN professor ON patient.professor_license_number = professor.license_number
-                            WHERE professor.license_number = '".$name."'";
+                            WHERE patient.resident_number = '".$r_number."'";
+            
                     $result = mysqli_query($conn, $sql);
 
                     if ($re = mysqli_fetch_array($result)){
@@ -44,6 +55,14 @@
                         <thead>
                         <tr>
                             <th>환자명</th>
+                            <th>성별</th>
+                            <th>키</th>
+                            <th>체중</th>
+                            <th>전화번호</th>
+                            <th>호실번호</th>
+                            <th>병명</th>
+                            <th>약품명</th>
+                            <th>교수명</th>
                         </tr>
                         </thead>
                         </tbody>
@@ -52,6 +71,14 @@
                     ?>       
                             <tr>
                                 <td><?=$re[0]?></td>
+                                <td><?=$re[1]?></td>
+                                <td><?=$re[2]?></td>
+                                <td><?=$re[3]?></td>
+                                <td><?=$re[4]?></td>
+                                <td><?=$re[5]?></td>
+                                <td><?=$re[6]?></td>
+                                <td><?=$re[7]?></td>
+                                <td><?=$re[8]?></td>
                             </tr>
                         <?php
                             if(!($re = mysqli_fetch_array($result))){
