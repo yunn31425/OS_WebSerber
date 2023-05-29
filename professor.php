@@ -14,6 +14,18 @@ $sql = "SELECT patient.name
         WHERE professor.license_number = '".$licence."'";
 $result = mysqli_query($conn, $sql);
 
-while($re = mysqli_fetch_array($result)){
-  print($re[0]);
-}    
+if ($re = mysqli_fetch_array($result)){
+    while(1){
+        echo "환자명<br>";
+        print($re[0]);
+        echo "<br>";
+        if(!($re = mysqli_fetch_array($result))){
+            print("------end of results------");
+            break;
+        }
+    }
+    
+}
+else{
+    print("해당 레코드 없음");
+}   
