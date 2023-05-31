@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="kr">
+
+<head>
+    <meta charset="utf-8">
+    <title>환자 미납 금액 확인</title>
+    <style>
+        body {
+            background-color: #F8F8F8;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            margin: 0;
+            display: inline;
+        }
+
+        h4 {
+            margin: 0;
+            display: inline;
+        }
+
+        a {
+            text-decoration: none;
+            color: #333333;
+        }
+
+        .container {
+            border: 2px solid black;
+            width: 70%;
+            background-color: #F8F8F8;
+            height: 470pt;
+            margin: auto;
+        }
+
+        .header {
+            border: 2px solid black;
+            width: 95%;
+            background-color: #FAFAD2;
+            height: 100pt;
+            margin: auto;
+            margin-top: 10px;
+            padding: 10px;
+        }
+
+        .content {
+            border: 2px solid black;
+            width: 95%;
+            background-color: #FAFAD2;
+            height: 300pt;
+            margin-bottom: 10pt;
+            margin: auto;
+            padding: 10px;
+        }
+
+        table {
+            margin-top: 10px;
+            margin-left: 10px;
+            border-collapse: collapse;
+            width: 100%;
+            margin: auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #333333;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #8BC34A;
+            color: #FFFFFF;
+        }
+
+        footer {
+            margin: auto;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>환자 미납 금액</h2>
+    </br>
+            <h4><a href="index_2.html">이전으로</a></h4>
+    </br>
+            <h4>환자 주민번호:</h4>
+            <form name="r_number" method="post" action="#" style="display:inline">
+                <input type="text" name="r_number" value="">
+                <input type="submit" value="입력" name="Submit">
+            </form>
+        </div>
+
+        <br>
+
+        <div class="content">
+            <?php
+            if (isset($_POST['Submit'])) {
+                error_reporting(E_ALL);
+                ini_set('display_errors', '1');
+                $conn = mysqli_connect(
+                    'localhost:3306',
+                    'root',
+                    'lab1234!',
+                    'hello'
+                );
+
+                $r_number = $_POST['r_number'];
+                $sql = "SELECT
+                            patient.name, 
+                            patient.phone_number, 
+                            patient.gender, 
+                            patient.height, 
+                            patient.weight, 
+                            patient.disease_name, 
+                            guardian.name, 
+                            prescription.medication_name, 
+                            prescription.medication_dosage,
+                            IF(hospital_room.room_number IS NULL, (prescription.medication_cost * prescription.medication_dosage) - payment.cost,
+                            ((hospital_room.cost + prescription.medication_cost * prescription.medication_dosage) - payment.cost)) AS unpaid_amount
+                        FROM patient
+                        LEFT JOIN hospital_room ON patient.room_number = hospital_room.room_number
+                        JOIN guardian ON patient.resident_number = guardian.patient_resident_number
+                        JOIN disease ON patient.disease_name = disease.disease_name
+                        JOIN prescription_details ON patient.resident_number = prescription_details.resident_number
+                        JOIN prescription ON prescription_details.medication_name = prescription.medication_name
+                        JOIN payment ON patient.resident_number = payment.patient_resident_number
+                        WHERE patient.resident_number =  '" . $r_number . "'";
+
+                $result = mysqli_query($conn, $sql);
+
+                if ($re = mysqli_fetch_array($result)) {
+            ?>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>환자명</th>
+                                <th>전화번호</th>
+                                <th>성별</th>
+                                <th>키</th>
+                                <th>체중</th>
+                                <th>질병명</th>
+                                <th>보호자명</th>
+                                <th>약품명</th>
+                                <th>투약량</th>
+                                <th>미납금액</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            while (1) {
+                                $i = 0;
+                            ?>
+                                <tr>
+                                    <?php
+                                    while ($i <= 8) {
+                                    ?>
+                                        <td><?= $re[$i] ?></td>
+                                    <?php
+                                        $i++;
+                                    }
+                                    ?>
+                                    <td><?= intval($re[$i]) . "원" ?></td>
+                                </tr>
+                            <?php
+                                if (!($re = mysqli_fetch_array($result))) {
+                            ?>
+                        </tbody>
+                    </table>
+                <?php
+                                    break;
+                                }
+                            }
+                        } else {
+                            print("해당 레코드 없음");
+                        }
+
+                        mysqli_close($conn);
+                    }
+                ?>
+            </div>
+        </div>
+    </body>
+
+    <footer>
+        경상국립대학교 항공우주및소프트웨어 운영체제 2023년 1학기
+    </footer>
+
+    </html>

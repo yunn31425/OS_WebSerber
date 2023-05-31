@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="kr">
+
+<head>
+    <meta charset="utf-8">
+    <title>교수 담당 환자 확인</title>
+    <style>
+        body {
+            background-color: #F8F8F8;
+            font-family: Arial, sans-serif;
+        }
+
+        h2 {
+            margin: 0;
+            display: inline;
+        }
+
+        h4 {
+            margin: 0;
+            display: inline;
+        }
+
+        a {
+            text-decoration: none;
+            color: #333333;
+        }
+
+        .container {
+            border: 2px solid black;
+            width: 70%;
+            background-color: #F8F8F8;
+            height: 470pt;
+            margin: auto;
+        }
+
+        .header {
+            border: 2px solid black;
+            width: 95%;
+            background-color: #FAFAD2;
+            height: 100pt;
+            margin: auto;
+            margin-top: 10px;
+            padding: 10px;
+        }
+
+        .content {
+            border: 2px solid black;
+            width: 95%;
+            background-color: #FAFAD2;
+            height: 300pt;
+            margin-bottom: 10pt;
+            margin: auto;
+            padding: 10px;
+        }
+
+        table {
+            margin-top: 10px;
+            margin-left: 10px;
+            border-collapse: collapse;
+            width: auto;
+            margin: auto;
+        }
+
+        th,
+        td {
+            border: 1px solid #333333;
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #8BC34A;
+            color: #FFFFFF;
+        }
+
+        footer {
+            margin: auto;
+            text-align: center;
+            color: #999999;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>교수 담당 환자 확인</h2>
+    </br>
+            <h4><a href="index_2.html">이전으로</a></h4>
+    </br>
+            <h4 style="display:inline">교수 면허번호  :   </h4>
+            <form name = "licence" method="post" action="#" style="display:inline"> 
+                <input type="text" name="licence"  value="">
+                <input type="submit" value="입력" name="Submit"> 
+            </form>
+        </div>
+        <br>
+        <div class="content">
+            <?php
+            if (isset($_POST['Submit'])) {
+                error_reporting(E_ALL);
+                ini_set('display_errors', '1');
+                $conn = mysqli_connect(
+                    'localhost:3306',
+                    'root',
+                    'lab1234!',
+                    'hello'
+                );
+
+                $licence = $_POST['licence'];
+                $sql = "SELECT patient.name
+                            FROM patient
+                            JOIN professor ON patient.professor_license_number = professor.license_number
+                            WHERE professor.license_number = '" . $licence . "'";
+                $result = mysqli_query($conn, $sql);
+
+                if ($re = mysqli_fetch_array($result)) {
+            ?>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>환자명</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            while (1) {
+                            ?>
+                                <tr>
+                                    <td><?= $re[0] ?></td>
+                                </tr>
+                            <?php
+                                if (!($re = mysqli_fetch_array($result))) {
+                            ?>
+                        </tbody>
+                    </table>
+                <?php
+                                    break;
+                                }
+                            }
+                        } else {
+                            print("해당 레코드 없음");
+                        }
+
+                        mysqli_close($conn);
+                    }
+                ?>
+
+            </div>
+        </div>
+
+    </body>
+    <footer>
+        경상국립대학교 항공우주및소프트웨어 운영체제 2023년 1학기
+    </footer>
+
+</html>
